@@ -1,0 +1,59 @@
+
+ Main User Stories:-
+
+User Story
+Description
+Acceptance criteria
+US 01
+Setup for Spark Structured Streaming With Kafka 
+
+(Ensure Seamless production of messages to a Kafka topic using an automated Python script)
+Start Apache Zookeeper which will act as a manager for the Kafka broker.
+Start Apache Kafka cluster/server to manage Kafka services.
+Create a topic called “transaction” to hold the continuous messages published with 3 partitions and 1 replication factor.
+Create a Python script or refer to the script provided and start producing messages to the topic at a time gap of 2 seconds (for testing purposes). 
+Start Hadoop demons to leverage the distributed storage capabilities.
+US 02
+Large or Unusual Transaction Amounts
+
+(Implement a rule-based filter to flag transactions above a certain threshold amount of 1 lakhs.)
+Create spark session and configure spark.sql.shuffle.partitions=2 (memory Efficiency)
+Read the topic from the earliest offset
+Apply a SQL query to find the records with Transaction Amounts  greater than  threshold  of 1 lakh
+Ensure proper checkpointing 
+Write the output data frame
+Sink:-  HDFS
+Format- .csv files
+trigger  - Every 5 second
+Output Mode - Complete
+Run the Streaming query continuously for 10 minutes.
+US 03
+Transactions from Unexpected Locations
+
+(Enrich transaction data with customer location data and flag transactions from unusual locations.)
+ Read the Static dataset customer
+Cache the customer  data of the new dataframe on each executor node
+Enrich the data of transactions df with customer data with the schema as (transaction_id, customer_id, amount, location, name, email, address  from customer dataset)
+Perform stateless transformation on data to filter records where the location from the Kafka topic is not in the base location or address of the customer.
+Write the output dataframe 
+Sink: Postgres SQL database
+ trigger - Unspecified
+Output Mode: Complete
+Run the Streaming query continuously for 10 minutes.
+US 04
+Multiple Purchases from the Same Card in a Short Time
+
+(Implement a sliding window operation to detect numerous transactions from the same card within a short time frame.)
+Implement a sliding window operation to detect multiple transactions from the same card within a short time frame (e.g., 2-minute window with 30-second slide).
+Set a watermark of 3 minutes to handle late data.
+Group transactions by customer_id and apply aggregation to count the number of transactions within each window.
+Filter out the groups where the number of transactions exceeds a certain threshold (e.g., more than 3 transactions within 2 minutes).
+Write the output DataFrame 
+Sink -  HDFS, Console 
+format - .parquet files 
+Output Mode: -Append 
+Run the streaming query continuously for a specified duration (e.g., 10 minutes).
+
+
+
+
