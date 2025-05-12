@@ -1,0 +1,141 @@
+Spark Standalone Architecture 
+
+3 Deployment Modes
+
+1. Spark Standalone -> Only installing Spark no other technology (Single Node, Multinode, distributed) 
+2. Apache Spark Yarn -> Using Spark With Hadoop
+3. Apache Spark Measos -> Kind of deprecated
+
+
+Spark Standalone Architecture:-
+
+Deamons:- 
+1. Master
+2. Worker
+
+Master-slave Architecture 
+
+Driver Program -> Any Spark  Program (Declaration of spark context ) -> Entry point to your app acts as a main method
+Initiated in Spark Master
+
+Client(Spark-submit) -> Cluster -> Master -> Driver Program (POC) 
+- Execution plan 
+- Cluster Manager (Spark itself) 	
+	- Resource (CPU, RAM(memory,cores))
+	- Launch Executors on Worker Nodes 
+	- Data Locality (start job where data is present ) 
+	
+Executor is a box where your task will get executed. 
+Register with driver program and send a heartbeat , Cluster will send the heartbeat 
+
+Driver program will start giving the task and monitoring the worker nodes/executors
+-parallelism and grouping 
+-Task is computed and the result is stored (persist in spark -> Intermediate data )
+
+Intermediate data 3 ways :-
+1. Memory only 
+2. Disk only 
+3. Memory and disk (Scaling & Durability)
+
+
+Grouping Transformation 
+
+- Again Requests for the resources 
+- New Executor is launched and start giving the feedback to Driver program 
+- Executes final output and Executes the task 
+
+Notes:- 
+- Empty worker nodes will send the heartbeat 
+
+
+
+--------------------------------------------------------------------
+
+# Start Spark
+cd /usr/local/spark
+cd sbin
+
+./start-all.sh
+jps
+
+# Create the Spark application
+nano sparkBasic.py
+
+# sparkBasic.py
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName("SparkApplication").getOrCreate()
+print(spark)
+
+spark.stop()
+
+# Submit the Spark job
+spark-submit --master spark://DEL1-LHP-N72044.synapse.com:7077 sparkBasic.py
+
+--------------------------------------------------------------
+# HDFS Integration
+
+# Start HDFS
+start-dfs.sh
+jps
+
+# Create a text file
+nano abc.txt
+
+# Upload the file to HDFS
+hdfs dfs -mkdir -p /user/your_username/
+hdfs dfs -put abc.txt /user/your_username/
+
+# Update sparkBasic.py for HDFS integration
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName("SparkApplication").getOrCreate()
+df = spark.read.text("hdfs://localhost:9000/user/your_username/abc.txt")
+df.show()
+
+spark.stop()
+
+---------------------------------------------------------------
+# Yarn Deployment
+
+# Start YARN
+start-yarn.sh
+jps
+
+# Submit the Spark job on YARN
+spark-submit --master yarn sparkBasic.py
+
+------------------------------------------------------
+Executor fails (Temporary issue - Memory issue) 
+
+-Driver retries to create one more Executor and do recomputation
+-Relaunch the executor 
+
+Worker Machine crashed(Hardware issue)
+- Data is lost / Task will fail / No intermediate output for this task 
+- Again read the data and retrigger the job 
+	Avoid this scenario
+	- HDFS (distribute and replicate) 
+	- Standalone
+	- If you have replications of your data ( Distribute and replicate data in memory and resides as metadata with driver/Heartbeats)
+	- Recreate the executor with cluster manager (only particular Task is recomputed)
+
+Driver Program Fails:-
+- Supervised (same) 
+- Recreate driver program and everything starts from initial 
+
+Master Node fails (SPOF / SPOC)
+- Zookeeper (HA) MOre than 1 master (1 active , 2 passive) 
+- Election ( out of 2 one is new master) 
+- Heartbeat from all worker nodes (Sync)
+
+Zookeeper fails
+- Master / Slave 
+- Peer to Peer 
+
+Leader / Follower architecture. -> No Monitoring required 
+
+
+
+	
+
