@@ -1,0 +1,78 @@
+ser Stories for PayFast Application
+User Story 1: User Profile Viewing
+Title: View User Profile
+As a user,
+I want to view my profile details,
+So that I can verify my personal information stored in the PayFast app.
+Acceptance Criteria:
+The system should authenticate the user using their PIN.
+The system should retrieve user details from the database.
+The user should be presented with their profile information, including name, email, contact number, and linked accounts.
+User Story 2: Balance Inquiry
+Title: Check Account Balance
+As a user,
+I want to check my account balance,
+So that I can manage my finances effectively.
+Acceptance Criteria:
+The system should authenticate the user using their PIN.
+The system should retrieve the current balance from the database.
+The user should be presented with the available balance in their account.
+User Story 3: Payment Processing
+Title: Make a Payment
+As a user,
+I want to make a payment to a contact or account,
+So that I can transfer funds securely through the PayFast app.
+Acceptance Criteria:
+The system should authenticate the user using their PIN.
+The system should allow the user to enter payment details (amount, recipient contact/account).
+The system should verify the recipient's details.
+The system should process the payment, update the balance, and store the transaction details in the database.
+The user should receive a confirmation of the successful payment.
+User Story 4: Bill Payment
+Title: Pay My Bills
+As a user,
+I want to pay my utility and service bills,
+So that I can manage my monthly expenses directly from the PayFast app.
+Acceptance Criteria:
+The system should authenticate the user using their PIN.
+The system should list available billers or allow the user to input the biller details.
+The user should be able to select a biller, enter the amount, and initiate payment.
+The system should process the payment, update the balance, and store the transaction details in the database.
+The user should receive a confirmation of the successful bill payment.
+Application Architecture Overview
+Client (Main Method)
+
+The main method serves as the entry point of the application, providing a CLI-based interface for users to interact with the PayFast app.
+It presents the user with options to view their profile, check balance, make payments, and pay bills.
+Service Layer
+
+The service layer contains the business logic for processing user requests, such as retrieving user details, processing payments, and managing bill payments.
+It interacts with the repository layer to perform CRUD operations on the database.
+Repository Layer
+
+The repository layer manages the database interactions using JDBC or an ORM like Hibernate.
+It handles queries for retrieving user details, balance information, and performing updates for payments and bill transactions.
+Database (DB)
+
+The database is managed using PostgreSQL and pgAdmin.
+It stores user profiles, account balances, transaction histories, and biller information.
+Sample Flow
+User Authentication:
+
+User is prompted to enter their PIN, which is authenticated against the stored credentials in the database.
+User Options:
+
+The authenticated user is presented with options:
+View Profile: Retrieves and displays user details.
+Show Balance: Retrieves and displays account balance.
+Make a Payment: Collects payment details and processes the transaction.
+Pay Bills: Lists available billers, collects payment details, and processes the payment.
+Service Execution:
+
+Based on the user's selection, the service layer invokes the appropriate methods to interact with the repository and database.
+Database Interaction:
+
+The repository executes SQL queries to retrieve or update data in the PostgreSQL database.
+Result Display:
+
+The outcome of the user's action (e.g., balance shown, payment successful) is displayed in the CLI.
